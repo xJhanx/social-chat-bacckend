@@ -1,4 +1,5 @@
-import express, { Router } from 'express';
+import express from 'express';
+import { Routes } from './router';
 export class Server {
 
     private readonly app = express();
@@ -10,8 +11,11 @@ export class Server {
     public start = () => {
 
         /**Midlewares */
-        this.app.use(express.json()); // raw
+        this.app.use(express.json()); 
 
+        /**Routes */
+        this.app.use(Routes.routes);
+        
         this.app.listen(this.port, () => {
             console.log(`Server running on port ${this.port}`)
         })
