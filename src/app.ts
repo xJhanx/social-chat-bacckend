@@ -9,10 +9,6 @@ import { Server } from "./presentation/server"
 
 
 function main() {
-    /** TODO::
-     * @params port,
-     * @param routes expected 
-     */
     const server = new Server(envs.PORT);
     server.start()
 }
