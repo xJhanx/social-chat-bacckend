@@ -1,5 +1,6 @@
 import express from 'express';
 import { Routes } from './router';
+import { AuthMiddleware } from './middlewares/auth.middleware';
 export class Server {
 
     private readonly app = express();
@@ -12,7 +13,8 @@ export class Server {
 
         /**Midlewares */
         this.app.use(express.json()); 
-
+        this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(AuthMiddleware.auth);
         /**Routes */
         this.app.use(Routes.routes);
         
