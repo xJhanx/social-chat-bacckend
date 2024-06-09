@@ -1,14 +1,13 @@
 
 import { envs } from "./config"
-import { Server } from "./presentation/server"
+import { App } from "./presentation/server"
+import "reflect-metadata";
 
 (() => {
     main()
 })()
 
-
-
 function main() {
-    const server = new Server(envs.PORT);
-    server.start()
+    const server = new App(envs.PORT);
+    server.start();
 }

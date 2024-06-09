@@ -1,14 +1,24 @@
 import express from 'express';
 import { Routes } from './routes/router';
 import { AuthMiddleware } from './middlewares';
-export class Server {
+import http from 'http';
+import { SocketIoServer } from './socket';
+import cors from 'cors';
+
+export class App {
 
     private readonly app = express();
-    constructor(public port: number) { }
+    constructor(private readonly port: number) { }
 
     public start = () => {
         /**CORS */
-        // set the cors policy
+        this.app.use(cors({
+            origin: ["http://empresatest:4200"],
+            methods: ["GET", "POST"],
+            allowedHeaders: ["Authorization"],
+            credentials: true,
+        }));
+
 
         /**Midlewares */
         this.app.use(express.json());
@@ -16,8 +26,13 @@ export class Server {
         // this.app.use(AuthMiddleware.auth);
         /**Routes */
         this.app.use(Routes.routes);
-        this.app.listen(this.port, () => {
+
+        /**Initialize server  */
+
+        const httpServer = http.createServer(this.app);
+        const socket = SocketIoServer.initialize(httpServer).io;
+        httpServer.listen(this.port, () => {
             console.log(`Server running on port ${this.port}`)
-        })
+        });
     }
 }
