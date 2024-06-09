@@ -1,5 +1,6 @@
 
 import { envs } from "./config"
+import { dataSource } from "./domain/database/type-orm/app-datasource";
 import { App } from "./presentation/server"
 import "reflect-metadata";
 
@@ -7,7 +8,15 @@ import "reflect-metadata";
     main()
 })()
 
-function main() {
+async function main() {
     const server = new App(envs.PORT);
-    server.start();
+    dataSource.initialize().then(() => {
+        console.table({
+            "Database": "Online",
+        });
+        server.start();
+    }).catch(err => {
+        console.table({"Database":"Offline",...err})
+        throw err;
+    });
 }
