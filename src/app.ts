@@ -1,6 +1,6 @@
 
 import { envs } from "./config"
-import { Server } from "./presentation/server"
+import { App } from "./presentation/server"
 
 (() => {
     main()
@@ -9,6 +9,6 @@ import { Server } from "./presentation/server"
 
 
 function main() {
-    const server = new Server(envs.PORT);
-    server.start()
+    const server = new App(envs.PORT);
+    server.start();
 }

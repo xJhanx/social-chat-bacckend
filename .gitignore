@@ -1,9 +1,11 @@
+
+
+
 .env
+
 /mongo
 postgres/
 node_modules/
 dist/
 build/
 coverage/
-bun.lockb
-package-lock.json
