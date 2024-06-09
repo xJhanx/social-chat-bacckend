@@ -8,18 +8,18 @@ import cors from 'cors';
 export class App {
 
     private readonly app = express();
-    constructor(public port: number) { }
+    constructor(private readonly port: number) { }
 
     public start = () => {
         /**CORS */
         this.app.use(cors({
-            origin: ["http://empresatest:4200"], // <--- Agrega tu origen permitido aquí
+            origin: ["http://empresatest:4200"], 
             methods: ["GET", "POST"],
             allowedHeaders: ["Authorization"],
             credentials: true,
             
         }));
-        // set the cors policy
+
 
         /**Midlewares */
         this.app.use(express.json());
