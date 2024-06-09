@@ -1,8 +1,4 @@
-
-
-
 .env
-
 /mongo
 postgres/
 node_modules/
@@ -10,3 +6,5 @@ dist/
 build/
 coverage/
 postgre/
+bun.lockb
+package-lock.json

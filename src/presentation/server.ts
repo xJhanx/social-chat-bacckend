@@ -13,11 +13,10 @@ export class App {
     public start = () => {
         /**CORS */
         this.app.use(cors({
-            origin: ["http://empresatest:4200"], 
+            origin: ["http://empresatest:4200"],
             methods: ["GET", "POST"],
             allowedHeaders: ["Authorization"],
             credentials: true,
-            
         }));
 
 
