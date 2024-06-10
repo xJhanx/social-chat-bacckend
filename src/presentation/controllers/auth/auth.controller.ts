@@ -9,8 +9,8 @@ export class AuthController {
         try {
             const [error, userData] = LoginUserDto.validate(req.body);
             if (error) return res.status(HttpStatusCode.BAD_REQUEST).send({ error });
-            const response = await this.authService.login(userData!);
-            res.status(HttpStatusCode.OK).send(response);
+            const token = await this.authService.login(userData!);
+            res.status(HttpStatusCode.OK).send({token});
         } catch (error) {
             console.log(error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ error });
@@ -21,8 +21,8 @@ export class AuthController {
         try {
             const [error, userData] = CreateUserDto.validate(req.body);
             if (error) return res.status(HttpStatusCode.BAD_REQUEST).send({ error });
-            const response = await this.authService.register(userData!);
-            res.status(HttpStatusCode.OK).send(response);
+            const token = await this.authService.register(userData!);
+            res.status(HttpStatusCode.OK).send({token});
         } catch (error) {
             console.log(error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ error });

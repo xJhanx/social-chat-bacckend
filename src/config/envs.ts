@@ -7,5 +7,6 @@ export const envs = {
     PASSWORD_DB: config.get('PASSWORD_DB').required().asString(),
     PORT_DB: config.get('PORT_DB').required().asPortNumber(),
     NAME_DB: config.get('NAME_DB').required().asString(),
-    HOST_DB: config.get('HOST_DB').required().asString()
+    HOST_DB: config.get('HOST_DB').required().asString(),
+    SECRET_KEY_TOKEN : config.get('SECRET_KEY_TOKEN').required().asString()
 }

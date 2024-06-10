@@ -8,10 +8,10 @@ export class AuthRoutes {
         const authService = new AuthService();
         const controller = new AuthController(authService);
 
-        router.post('/login', controller.login);
-        router.post('/register', controller.register);
         router.get('/logout', controller.logout);
         router.get('/recoverPassword', controller.recoverPassword);
+        router.post('/register', controller.register);
+        router.post('/login', controller.login);
 
         return router;
     }

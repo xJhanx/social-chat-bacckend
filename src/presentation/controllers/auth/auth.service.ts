@@ -1,4 +1,4 @@
-import { Bscrypt } from "../../../core";
+import { Bscrypt, Jwt } from "../../../core";
 import { UserRepository } from "../../../domain/repositories";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -9,13 +9,16 @@ export class AuthService {
         try {
             const user = await UserRepository.findOne({ email: data.email });
             if (!user) throw 'Credentials does not match in our system';
-
             const isMatch = await Bscrypt.compare(data.password, user.password);
             if (!isMatch) throw 'Credentials Wrongs';
 
-            // TODO: return token 
-            return user;
-
+            const payload = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            }
+            const token = user.id ? await Jwt.generate(payload) : null;            
+            return token;
         } catch (error) {
             throw error;
         }
@@ -29,10 +32,13 @@ export class AuthService {
                 password: await Bscrypt.hash(data.password),
                 status: data.status
             });
-            const repsonse = await user.save();
-            //TODO : return token
-
-            return repsonse;
+            const createdUSer = await user.save();
+            const payload = {
+                id: createdUSer.id,
+                name: createdUSer.name,
+                email: createdUSer.email,
+            }
+            return createdUSer.id ? Jwt.generate(payload) : null;
         } catch (error) {
             throw error;
         }
@@ -44,7 +50,7 @@ export class AuthService {
     }
 
     public recoverPassword = () => {
-        return 'recoverPassword is runnign';
+        return 'No implemented';
     }
 
 }
