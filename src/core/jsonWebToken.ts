@@ -10,11 +10,13 @@ export class Jwt {
         }
     }
 
-    static verify(token: string) {
+    static verify(token: string) : [boolean, any] {
         try {
-            return jwt.verify(token, envs.SECRET_KEY_TOKEN);
+            if (!token) return [false, null];
+            const result = jwt.verify(token, envs.SECRET_KEY_TOKEN);
+            return [true, result];
         } catch (error) {
-            throw error;
+            return [false, error];
         }
     }
 

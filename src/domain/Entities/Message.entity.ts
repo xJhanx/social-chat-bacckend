@@ -1,33 +1,22 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
 import { UserMessage } from "./UserMessage.entity";
-import { Room } from "./Room.entity";
 
 
 @Entity()
-export class User {
+export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
         type: "varchar",
     })
-    name: string;
-
-    @Column({
-        type: "varchar",
-        unique: true,
-    })
-    email: string;
-
-    @Column({
-        type: "varchar",
-    })
-    password: string;
+    text: string;
 
     @Column({
         type: "boolean",
+        default: () => 'false',
     })
-    status: boolean;
+    viewed: boolean;
 
     @CreateDateColumn({
         type: 'timestamp',
@@ -42,9 +31,6 @@ export class User {
     })
     updatedAt: Date;
 
-    @OneToMany(() => UserMessage, userMessage => userMessage.user)
+    @OneToMany(() => UserMessage, userMessage => userMessage.message)
     userMessages: UserMessage[];
-    
-    @ManyToMany(() => Room, (room) => room.users)
-    rooms : Room[];
 }

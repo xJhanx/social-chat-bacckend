@@ -1,25 +1,26 @@
+import { response } from "express";
 import { CreateUserDto } from "../../presentation/controllers/auth/dto/create-user.dto";
 import { User } from "../Entities";
 import { dataSource } from "../database/type-orm/app-datasource";
 
 export class UserRepository {
 
-    constructor(private user: CreateUserDto) { }
-    public async save() {
+    public async save(user: CreateUserDto) {
         try {
-            const user = new User();
-            user.name = this.user.name;
-            user.email = this.user.email;
-            user.status = this.user.status;
-            user.password = this.user.password;
-            await dataSource.manager.save(user);
-            return user;
+            const userModel = new User();
+            userModel.name = user.name;
+            userModel.email = user.email;
+            userModel.status = user.status;
+            userModel.password = user.password;
+
+            const response = await dataSource.manager.save(userModel);
+            return response;
         } catch (error) {
             throw error;
         }
     }
 
-    public static async find(column: any) {
+    public async find(column: any) {
         try {
             const user = await dataSource.getRepository(User);
             const response = await user.find({
@@ -32,7 +33,7 @@ export class UserRepository {
         }
     }
 
-    public static async findOne(column: any) {
+    public async findOne(column: any) {
         try {
             const user = await dataSource.getRepository(User);
             const response = await user.findOne({

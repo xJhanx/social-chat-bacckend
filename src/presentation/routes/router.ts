@@ -7,7 +7,7 @@ export class Routes {
     static get routes() {
         const router = Router();
         router.use('/auth', AuthRoutes.routes);
-        router.use(AuthMiddleware.auth);
+        // router.use(AuthMiddleware.auth);
         router.use('/chat', ChatRouter.routes);
         return router;
     }

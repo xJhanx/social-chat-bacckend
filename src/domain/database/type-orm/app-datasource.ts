@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
-import { User } from "../../Entities";
+import { Message, User, UserMessage } from "../../Entities";
 import { envs } from "../../../config";
+import { Room } from "../../Entities/Room.entity";
 
 
 export const dataSource = new DataSource({
@@ -12,7 +13,7 @@ export const dataSource = new DataSource({
     database: envs.NAME_DB,
     synchronize: true,
     logging: true,
-    entities: [User],
+    entities: [User,Message,UserMessage,Room],
     subscribers: [],
     migrations: [],
 });

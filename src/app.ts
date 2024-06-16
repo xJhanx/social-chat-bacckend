@@ -17,6 +17,9 @@ async function main() {
         server.start();
     }).catch(err => {
         console.table({ "Database": "Offline", "Consecuencias": "El servidor no se puedo inicializar", ...err });
-        throw err;
+        // setInterval(() => {
+        //     main();
+        // }, 3000);
+        console.error(err);
     });
 }

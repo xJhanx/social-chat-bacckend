@@ -4,10 +4,10 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
 
 export class AuthService {
-
+    constructor(private readonly userRepository: UserRepository) { }
     public login = async (data: LoginUserDto) => {
         try {
-            const user = await UserRepository.findOne({ email: data.email });
+            const user = await this.userRepository.findOne({ email: data.email });
             if (!user) throw 'Credentials does not match in our system';
             const isMatch = await Bscrypt.compare(data.password, user.password);
             if (!isMatch) throw 'Credentials Wrongs';
@@ -17,7 +17,7 @@ export class AuthService {
                 name: user.name,
                 email: user.email,
             }
-            const token = user.id ? await Jwt.generate(payload) : null;            
+            const token = user.id ? await Jwt.generate(payload) : null;
             return token;
         } catch (error) {
             throw error;
@@ -26,13 +26,12 @@ export class AuthService {
 
     public register = async (data: CreateUserDto) => {
         try {
-            const user = new UserRepository({
+            const createdUSer = await this.userRepository.save({
                 name: data.name,
                 email: data.email,
                 password: await Bscrypt.hash(data.password),
                 status: data.status
             });
-            const createdUSer = await user.save();
             const payload = {
                 id: createdUSer.id,
                 name: createdUSer.name,

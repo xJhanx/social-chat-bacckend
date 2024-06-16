@@ -9,12 +9,17 @@ export class AuthMiddleware {
             if (req.headers.authorization!.split(' ').at(0) !== 'Bearer') {
                 return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized' });
             }
-            const token = req.headers.authorization!.split(' ').at(1);            
-            if (await Jwt.verify(token!) === null) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized' });
+            const token = req.headers.authorization!.split(' ').at(1);
+            if (!token || token == undefined) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized' }); 
+            const [statusToken, payload] = Jwt.verify(token!);
+            
+            /**
+             * TODO: revisar que usuario en el token exista y agregarlo al body de la petición
+             */
+            if (!statusToken) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized',reloggin:true });
             next();
 
-        } catch (error) {
-            console.log(error);
+        } catch (error : any) {
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ error: 'Internal error' });
         }
     }
