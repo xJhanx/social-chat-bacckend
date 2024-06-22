@@ -13,7 +13,7 @@ export class CreateUserDto {
 
     public static validate(bodyRequest :any): [string | null, CreateUserDto | null] {
         const { name, email, password,status } = bodyRequest;
-        let status_default = false;
+        let status_default = true;
         if (!name || name == "") {
             return ["name is required", null];
         }

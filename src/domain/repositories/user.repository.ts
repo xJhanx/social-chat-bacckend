@@ -44,4 +44,17 @@ export class UserRepository {
             throw error;
         }
     }
+
+    public async findRoomsWithRelations(column: any, relations: string[]): Promise<User[] | null> {
+        try {
+            const user = await dataSource.getRepository(User);
+            const response = await user.find({
+                where: column,
+                relations
+            });
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

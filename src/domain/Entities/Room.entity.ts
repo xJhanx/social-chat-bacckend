@@ -1,11 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, Column, ManyToMany, JoinTable } from "typeorm";
 import { User } from "./User.entity";
-import { UserMessage } from "./UserMessage.entity";
 
 @Entity()
 export class Room {
-
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -14,7 +11,7 @@ export class Room {
     })
     name: string;
 
-    @ManyToMany(() => User, (user) => user)
+    @ManyToMany(() => User, (user) => user.rooms)
     @JoinTable()
     users: User[];
     
@@ -30,7 +27,5 @@ export class Room {
         onUpdate: 'CURRENT_TIMESTAMP',
     })
     updatedAt: Date;
-
-
 
 }

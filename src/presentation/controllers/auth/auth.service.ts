@@ -1,4 +1,4 @@
-import { Bscrypt, Jwt } from "../../../core";
+import { Bscrypt, HttpException, Jwt } from "../../../core";
 import { UserRepository } from "../../../domain/repositories";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -8,7 +8,7 @@ export class AuthService {
     public login = async (data: LoginUserDto) => {
         try {
             const user = await this.userRepository.findOne({ email: data.email });
-            if (!user) throw 'Credentials does not match in our system';
+            if (!user) throw new HttpException('Credentials does not match in our system', 400);
             const isMatch = await Bscrypt.compare(data.password, user.password);
             if (!isMatch) throw 'Credentials Wrongs';
 

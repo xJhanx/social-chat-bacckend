@@ -1,3 +1,4 @@
+import { In } from "typeorm";
 import { User, UserMessage } from "../Entities";
 import { Room } from "../Entities/Room.entity";
 import { dataSource } from "../database/type-orm/app-datasource";
@@ -28,7 +29,21 @@ export class RoomRepository {
         }
     }
 
-    public async saveList(room: Room, users: User[]) {
+    public async findOneWithRelations(ids: any[], relations: string[]) : Promise<Room[] | null> {
+        try {
+            const roomModel = await dataSource.manager.getRepository(Room);
+            return await roomModel.find({
+                where: {
+                    id : In(ids)
+                },
+                relations
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async saveList(room: Room, users: User[]) : Promise<Room> {
         try {
             const roomModel = await this.findOne({ id: room.id });
             if (!roomModel) throw new Error('No se ha podido encontrar la sala');

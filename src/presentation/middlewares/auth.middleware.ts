@@ -1,9 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatusCode, Jwt } from "../../core";
+import { UserRepository } from "../../domain/repositories";
 
 export class AuthMiddleware {
 
-    static auth = async (req: Request, res: Response, next: NextFunction) => {
+    constructor(private readonly userRepository : UserRepository) { }
+
+    auth = async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.headers.authorization) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized' });
             if (req.headers.authorization!.split(' ').at(0) !== 'Bearer') {
@@ -13,9 +16,10 @@ export class AuthMiddleware {
             if (!token || token == undefined) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized' }); 
             const [statusToken, payload] = Jwt.verify(token!);
             
-            /**
-             * TODO: revisar que usuario en el token exista y agregarlo al body de la petición
-             */
+            const user = await this.userRepository.findOne({ id: payload.id });
+            if (!user || !user.status) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized',reloggin:true });
+            req.body.sender_id = payload.id;
+            
             if (!statusToken) return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'No authorized',reloggin:true });
             next();
 

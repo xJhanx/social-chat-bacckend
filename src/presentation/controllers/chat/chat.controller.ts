@@ -24,6 +24,21 @@ export class ChatController {
         }
     }
 
+    getChats = async (req: Request, res: Response) => {
+        try {
+            const { sender_id } = req.body;
+            const idRooms = await this.chatService.getIdRoomByUser(sender_id);
+            const chats = await this.chatService.getChats(sender_id,idRooms!);
+            res.status(HttpStatusCode.OK).send(chats);
+        } catch (exception) {
+            console.log(exception);
+            if (exception instanceof HttpException) {
+                return res.status(exception.status).send({ error: exception.error });
+            }
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ exception });
+        }
+    }
+
     mockOrder = async (req: Request, res: Response) => {
         // ?api: EXITO
         // let responseTest = {
@@ -51,13 +66,41 @@ export class ChatController {
 
         //? api COLOMBIANA
         const reponse = {
-            token : `123456789OiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZ
-                XNzVG9rZW4iLCJqdGkiOiI5N2RjYzBlZS1mOTU3LTQ0N2EtYThmOC02ZmYyM2VhYmRkZjEiLCJpYXQiOi
-                IxMC8yNC8yMDIyIDU6MTM6MTIgUE0iLCJVc2VySWQiOiIxIiwiVXNlck5hbWUiOiI4MDAwMDc4MTM1Iiw
-                iZXhwIjoxNjY2NjMxNjUyLCJpc3MiOiJKV1RBdXRoZW50aWNhdGlvblNlcnZlciIsImF1ZCI6IkpXVFNl
-                cnZpY2VQb3N0bWFuQ2xpZW50In0.3P_AekTcsL7TJ280ehDpn06MfusEd-9EwnCT2LLvgyo`,
+            token: `123456789OiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiI5N2RjYzBlZS1mOTU3LTQ0N2EtYThmOC02ZmYyM2VhYmRkZjEiLCJpYXQiOiIxMC8yNC8yMDIyIDU6MTM6MTIgUE0iLCJVc2VySWQiOiIxIiwiVXNlck5hbWUiOiI4MDAwMDc4MTM1IiwiZXhwIjoxNjY2NjMxNjUyLCJpc3MiOiJKV1RBdXRoZW50aWNhdGlvblNlcnZlciIsImF1ZCI6IkpXVFNlcnZpY2VQb3N0bWFuQ2xpZW50In0.3P_AekTcsL7TJ280ehDpn06MfusEd-9EwnCT2LLvgyo`,
             userId: 1,
         }
+        console.log("reunning mock token");
+
         return res.status(200).send(reponse);
+    }
+
+    mockGetReports = async (req: Request, res: Response) => {
+        // ?api: EXITO
+        let responseTest = [
+            {
+                pin: "0000001",
+                fechaSolicitud: "2020-01-01",
+                fechaFacturacion: "2020-01-01",
+                noFactura: "0000002",
+                valorFacturado: "1000 USD",
+            },
+            {
+                pin: "0000002",
+                fechaSolicitud: "2020-01-01",
+                fechaFacturacion: "2020-01-01",
+                noFactura: "0000002",
+                valorFacturado: "1000 USD",
+            },
+            {
+                pin: "0000003",
+                fechaSolicitud: "2020-01-01",
+                fechaFacturacion: "2020-01-01",
+                noFactura: "0000002",
+                valorFacturado: "1000 USD",
+            },
+        ]
+        console.log("return mockGetReports");
+
+        return res.status(500).json(responseTest);
     }
 }

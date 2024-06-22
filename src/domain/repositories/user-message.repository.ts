@@ -3,7 +3,7 @@ import { dataSource } from "../database/type-orm/app-datasource";
 
 export class UserMessageRepository {
 
-    public async save(user: User, message: Message) {
+    public async save(user: User, message: Message): Promise<UserMessage> {
         try {
             const userMessage = new UserMessage();
             userMessage.user = user;

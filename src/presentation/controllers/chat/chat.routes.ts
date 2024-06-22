@@ -20,8 +20,13 @@ export class ChatRouter {
         /** controller */
         const controller = new ChatController(service);
         router.post('/send-message', controller.sendMessage);
+        router.post('/get-chats', controller.getChats);
+
+        //mi mock para gases del oriente
         router.post('/mock-send-order', controller.mockOrder);
         router.post('/mock-token', controller.mockToken);
+        router.post('/get-reports', controller.mockGetReports);
+
         return router;
     }
 }

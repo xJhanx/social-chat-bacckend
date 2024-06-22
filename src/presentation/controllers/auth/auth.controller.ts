@@ -13,7 +13,7 @@ export class AuthController {
             res.status(HttpStatusCode.OK).send({token});
         } catch (error) {
             console.log(error);
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ error });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json(error);
         }
     }
 
