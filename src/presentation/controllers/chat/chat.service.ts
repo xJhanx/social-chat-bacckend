@@ -42,6 +42,54 @@ export class ChatService {
         return rooms;
     }
 
+    public async getConversation(room_id: number) {
+        const data = await this.roomRepository.findOneWithRelations([room_id],
+            ['users',
+                'users.userMessages',
+                'users.userMessages.message',
+            ]);
+        let conversation = data?.flatMap(room => {
+            return room.users.flatMap(user => {
+                return user.userMessages.flatMap(userMessage => {
+                    return {
+                        room_id : room.id,
+                        messages : {
+                            user_id : user.id,
+                            message_id : userMessage.id,
+                            viewed : userMessage.message.viewed,
+                            name_user : user.name,
+                            message : userMessage.message.text,
+                            created_at : userMessage.message.createdAt,
+                            updated_at : userMessage.message.updatedAt
+                        }
+                    }
+                })
+            })
+        });
+        // Ordenar por created_at
+        if(!conversation) return [];
+        const sortedConversation = conversation
+        .sort((a, b) => new Date(a.messages.created_at).getTime() - new Date(b.messages.created_at).getTime());
+
+        // const conversation = data?.map(room => {
+        //     return {
+        //         room_id : room.id,
+        //         users : room.users.map(user => {
+        //             return {
+        //                 user_id: user.id,
+        //                 name: user.name,
+        //                 messages : user.userMessages.flatMap(userMessage => {
+        //                     return {
+        //                         message : userMessage.message
+        //                     }
+        //                 })
+        //             }
+        //         })
+        //     }
+        // })
+        return sortedConversation;
+    }
+
     public async getChats(id_user: number, id_rooms: number[]) {
         const rooms = await this.roomRepository.findOneWithRelations(id_rooms, ['users']);
         const chats = rooms?.flatMap(room => {

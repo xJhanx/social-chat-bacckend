@@ -1,7 +1,6 @@
 import { Entity,PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn, ManyToOne } from "typeorm";
 import { User } from "./User.entity";
 import { Message } from "./Message.entity";
-import { Room} from "./Room.entity";
 
 @Entity()
 export class UserMessage {

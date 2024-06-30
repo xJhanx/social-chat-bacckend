@@ -18,7 +18,7 @@ export class MessageDto {
             return ["recipient_id and must be a number", null];
         }
 
-        if (room_id && !isNaN(room_id)) {
+        if (room_id && isNaN(room_id)) {
             return ["room_id and must be a number", null];
         }
         

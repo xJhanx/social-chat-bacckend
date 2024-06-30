@@ -39,6 +39,20 @@ export class ChatController {
         }
     }
 
+    getConversation = async (req: Request, res: Response) => {
+        try {
+            const { room_id } = req.body;
+            const conversation = await this.chatService.getConversation(room_id);
+            res.status(HttpStatusCode.OK).send(conversation);
+        } catch (exception) {
+            console.log(exception);
+            if (exception instanceof HttpException) {
+                return res.status(exception.status).send({ error: exception.error });
+            }
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ exception });
+        }
+    }
+
     mockOrder = async (req: Request, res: Response) => {
         // ?api: EXITO
         // let responseTest = {

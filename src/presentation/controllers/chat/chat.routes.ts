@@ -21,6 +21,7 @@ export class ChatRouter {
         const controller = new ChatController(service);
         router.post('/send-message', controller.sendMessage);
         router.post('/get-chats', controller.getChats);
+        router.use('/get-conversation', controller.getConversation);
 
         //mi mock para gases del oriente
         router.post('/mock-send-order', controller.mockOrder);
