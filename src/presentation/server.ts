@@ -9,7 +9,7 @@ export class App {
     private readonly app = express();
     constructor(private readonly port: number) { }
 
-    public start = () => {
+    public start = async () => {
         /**CORS */
         this.app.use(cors({
             origin: 'http://localhost:4200',
@@ -22,12 +22,15 @@ export class App {
         /**Midlewares */
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        /**Routes */
-        this.app.use(Routes.routes);
-
+        
         /**Initialize server  */
-        const httpServer = http.createServer(this.app);
-        const socket = SocketIoServer.initialize(httpServer).io;
+        const httpServer = await http.createServer(this.app);
+        const socket = await SocketIoServer.initialize(httpServer)
+        socket.workSocket()
+        /**Routes
+         * Se usan las rutas depues ya que los routes requieren la intancia del socket
+         */
+        this.app.use(Routes.routes);
         httpServer.listen(this.port, () => {
             console.log(`Server running on port ${this.port}`)
         });

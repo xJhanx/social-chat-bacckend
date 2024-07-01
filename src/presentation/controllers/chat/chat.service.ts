@@ -1,5 +1,6 @@
 import { HttpException } from "../../../core";
 import { MessageRepository, RoomRepository, UserMessageRepository, UserRepository } from "../../../domain/repositories";
+import { SocketIoServer } from "../../socket";
 import { MessageDto } from "./dto";
 
 export class ChatService {
@@ -8,7 +9,8 @@ export class ChatService {
         private readonly messageRepository: MessageRepository,
         private readonly userRepository: UserRepository,
         private readonly userMessageRepository: UserMessageRepository,
-        private readonly roomRepository: RoomRepository) { }
+        private readonly roomRepository: RoomRepository,
+        private readonly socketService : SocketIoServer) { }
 
     public async send(data: MessageDto) {
         try {
@@ -27,6 +29,15 @@ export class ChatService {
                 const roomCreated = await this.roomRepository.create(nameRoom);
                 const roomListCreated = await this.roomRepository.saveList(roomCreated, [userSender, userRecipient]);
                 return roomListCreated;
+            }
+            if(userMessageCreated){
+                console.log("Activando evento socket");
+                this.socketService.io.sockets.sockets.forEach((socket) => {
+                    if(+socket.handshake.auth.iduser === +data.recipient_id!){
+                        console.log("socket encontrado:",socket.id);
+                        this.socketService.io.to(socket.id).emit('message_event', data.room_id);
+                    }
+                })
             }
             return userMessageCreated;
         } catch (error) {

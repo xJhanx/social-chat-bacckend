@@ -4,7 +4,7 @@ import http from 'http';
 export class SocketIoServer {
     private static instance: SocketIoServer;
     public io: Server;
-
+    public userSockets = new Map(); // Mapear ID de usuario a socket
     private constructor(server: http.Server) {
         this.io = new Server(server,{
             cors: {
@@ -29,6 +29,28 @@ export class SocketIoServer {
             throw new Error('SocketIoServer has not been initialized');
         }
         return SocketIoServer.instance;
+    }
+
+    public async workSocket(){
+        /**Middlewares */
+        // this.io.use((socket, next) => {
+        //     const username = socket.handshake.auth.username;
+        //     if (!username) {
+        //       return next(new Error("invalid username"));
+        //     }
+        //     socket.username = username;
+        //     next();
+        //   });
+
+        await this.io.on('connection', (socket) => {
+
+            console.log('a user connected',socket.id);
+
+            socket.on('disconnect', (socket) => {
+                console.log('user disconnected',socket);
+            });
+        });
+        
     }
 
 }
