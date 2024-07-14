@@ -10,7 +10,7 @@ export class ChatService {
         private readonly userRepository: UserRepository,
         private readonly userMessageRepository: UserMessageRepository,
         private readonly roomRepository: RoomRepository,
-        private readonly socketService : SocketIoServer) { }
+        private readonly socketService: SocketIoServer) { }
 
     public async send(data: MessageDto) {
         try {
@@ -18,7 +18,7 @@ export class ChatService {
             const userModel = await this.userRepository.findOne({ id: data.sender_id });
             if (!userModel) throw new HttpException('user not found', 404);
 
-            const userMessageCreated = await this.userMessageRepository.save(userModel, messageCreated);
+            let room = null;
 
             if (!data.room_id) { // si no hay un Id de sala
                 const userSender = await this.userRepository.findOne({ id: data.sender_id });
@@ -26,20 +26,23 @@ export class ChatService {
                 console.log(userRecipient, userSender);
                 if (!userRecipient || !userSender) throw new HttpException('users not found', 404);
                 const nameRoom = `${userSender.name}-${userRecipient.name}`;
-                const roomCreated = await this.roomRepository.create(nameRoom);
-                const roomListCreated = await this.roomRepository.saveList(roomCreated, [userSender, userRecipient]);
-                return roomListCreated;
+                room = await this.roomRepository.create(nameRoom);
+                const roomListCreated = await this.roomRepository.saveList(room, [userSender, userRecipient]);
+                //return roomListCreated;
             }
-            if(userMessageCreated){
+            const idRoomForMessage = room?.id ?? data.room_id;
+            const userMessageCreated = await this.userMessageRepository.save(userModel, messageCreated, idRoomForMessage);
+
+            if (userMessageCreated) {
                 console.log("Activando evento socket");
                 this.socketService.io.sockets.sockets.forEach((socket) => {
-                    if(+socket.handshake.auth.iduser === +data.recipient_id!){
-                        console.log("socket encontrado:",socket.id);
+                    if (+socket.handshake.auth.iduser === +data.recipient_id!) {
+                        console.log("socket encontrado:", socket.id);
                         this.socketService.io.to(socket.id).emit('message_event', data.room_id);
                     }
                 })
             }
-            return userMessageCreated;
+            return room?.id ?? data.room_id;
         } catch (error) {
             throw error;
         }
@@ -54,6 +57,8 @@ export class ChatService {
     }
 
     public async getConversation(room_id: number) {
+        console.log(room_id);
+
         const data = await this.roomRepository.findOneWithRelations([room_id],
             ['users',
                 'users.userMessages',
@@ -62,42 +67,28 @@ export class ChatService {
         let conversation = data?.flatMap(room => {
             return room.users.flatMap(user => {
                 return user.userMessages.flatMap(userMessage => {
-                    return {
-                        room_id : room.id,
-                        messages : {
-                            user_id : user.id,
-                            message_id : userMessage.id,
-                            viewed : userMessage.message.viewed,
-                            name_user : user.name,
-                            message : userMessage.message.text,
-                            created_at : userMessage.message.createdAt,
-                            updated_at : userMessage.message.updatedAt
+                    if (+userMessage.room_id == room_id) {
+                        return {
+                            room_id: room.id,
+                            messages: {
+                                user_id: user.id,
+                                message_id: userMessage.id,
+                                viewed: userMessage.message.viewed,
+                                name_user: user.name,
+                                message: userMessage.message.text,
+                                created_at: userMessage.message.createdAt,
+                                updated_at: userMessage.message.updatedAt
+                            }
                         }
                     }
                 })
             })
         });
+        conversation = conversation?.filter(conversation => conversation != undefined);
         // Ordenar por created_at
-        if(!conversation) return [];
+        if (!conversation) return [];
         const sortedConversation = conversation
-        .sort((a, b) => new Date(a.messages.created_at).getTime() - new Date(b.messages.created_at).getTime());
-
-        // const conversation = data?.map(room => {
-        //     return {
-        //         room_id : room.id,
-        //         users : room.users.map(user => {
-        //             return {
-        //                 user_id: user.id,
-        //                 name: user.name,
-        //                 messages : user.userMessages.flatMap(userMessage => {
-        //                     return {
-        //                         message : userMessage.message
-        //                     }
-        //                 })
-        //             }
-        //         })
-        //     }
-        // })
+            .sort((a, b) => new Date(a!.messages.created_at).getTime() - new Date(b!.messages.created_at).getTime());
         return sortedConversation;
     }
 
@@ -112,14 +103,14 @@ export class ChatService {
                     room: room.id
                 }));
         });
-        if(!chats) return [];
-        let noDuplicateChats : any[] = [];
+        if (!chats) return [];
+        let noDuplicateChats: any[] = [];
 
         chats.map(chat => {
-            if(noDuplicateChats.findIndex((element) => element.id === chat.id) === -1){
+            if (noDuplicateChats.findIndex((element) => element.id === chat.id) === -1) {
                 noDuplicateChats.push(chat)
             };
-        });        
+        });
         return noDuplicateChats;
     }
 

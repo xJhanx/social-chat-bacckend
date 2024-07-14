@@ -1,6 +1,7 @@
-import { Entity,PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity,PrimaryGeneratedColumn,CreateDateColumn,UpdateDateColumn, ManyToOne, Column } from "typeorm";
 import { User } from "./User.entity";
 import { Message } from "./Message.entity";
+import { Room } from "./Room.entity";
 
 @Entity()
 export class UserMessage {
@@ -16,6 +17,8 @@ export class UserMessage {
     @ManyToOne(() => Message, message => message.userMessages)
     message: Message;
 
+    @Column()
+    room_id: string;
 
     @CreateDateColumn({
         type: 'timestamp',

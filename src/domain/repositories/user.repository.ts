@@ -2,6 +2,7 @@ import { response } from "express";
 import { CreateUserDto } from "../../presentation/controllers/auth/dto/create-user.dto";
 import { User } from "../Entities";
 import { dataSource } from "../database/type-orm/app-datasource";
+import { Like } from "typeorm";
 
 export class UserRepository {
 
@@ -38,6 +39,21 @@ export class UserRepository {
             const user = await dataSource.getRepository(User);
             const response = await user.findOne({
                 where: column
+            });
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async findOneLike(column: string, value: string) {
+        try {
+            const user = await dataSource.getRepository(User);
+            const response = await user.find({
+                where:{
+                    [column] : Like(`%${value}%`),
+                },
+                select: ['id', 'name']
             });
             return response;
         } catch (error) {

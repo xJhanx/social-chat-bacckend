@@ -21,11 +21,11 @@ export class ChatRouter {
         /** services */
         const service = new ChatService(messageRepo,userRepo, userMessageRepo, roomRepo,socket);
         /** controller */
-        const controller = new ChatController(service);
+        const controller = new ChatController(service,userRepo);
         router.post('/send-message', controller.sendMessage);
         router.post('/get-chats', controller.getChats);
-        router.use('/get-conversation', controller.getConversation);
-
+        router.post('/get-conversation', controller.getConversation);
+        router.post('/get-contacts-by-name', controller.getContactsByName);
         //mi mock para gases del oriente
         router.post('/mock-send-order', controller.mockOrder);
         router.post('/mock-token', controller.mockToken);

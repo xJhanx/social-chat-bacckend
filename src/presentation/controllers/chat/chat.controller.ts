@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { HttpException, HttpStatusCode } from "../../../core";
 import { MessageDto } from "./dto";
 import { ChatService } from "./chat.service";
+import { UserRepository } from "../../../domain/repositories";
 
 export class ChatController {
-    constructor(private readonly chatService: ChatService) { }
+    constructor(private readonly chatService: ChatService, private readonly userService: UserRepository) { }
 
     sendMessage = async (req: Request, res: Response) => {
         try {
@@ -28,7 +29,9 @@ export class ChatController {
         try {
             const { sender_id } = req.body;
             const idRooms = await this.chatService.getIdRoomByUser(sender_id);
-            const chats = await this.chatService.getChats(sender_id,idRooms!);
+            const chats = await this.chatService.getChats(sender_id, idRooms!);
+            console.log(chats);
+            
             res.status(HttpStatusCode.OK).send(chats);
         } catch (exception) {
             console.log(exception);
@@ -44,6 +47,20 @@ export class ChatController {
             const { room_id } = req.body;
             const conversation = await this.chatService.getConversation(room_id);
             res.status(HttpStatusCode.OK).send(conversation);
+        } catch (exception) {
+            console.log(exception);
+            if (exception instanceof HttpException) {
+                return res.status(exception.status).send({ error: exception.error });
+            }
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send({ exception });
+        }
+    }
+    getContactsByName = async (req: Request, res: Response) => {
+        try {
+            const { sender_id,user } = req.body;
+            const data = await this.userService.findOneLike('name',user );
+            const contacts = data.filter(item => item.id !== sender_id);
+            res.status(HttpStatusCode.OK).send(contacts);
         } catch (exception) {
             console.log(exception);
             if (exception instanceof HttpException) {
