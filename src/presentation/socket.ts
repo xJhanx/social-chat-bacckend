@@ -6,13 +6,14 @@ export class SocketIoServer {
     public io: Server;
     public userSockets = new Map(); // Mapear ID de usuario a socket
     private constructor(server: http.Server) {
-        this.io = new Server(server,{
+        this.io = new Server(server, {
             cors: {
-            origin: "http://localhost:4200", // <--- Agrega tu origen permitido aquí
-            methods: ["GET", "POST"],
-            allowedHeaders: ["Authorization"],
-            credentials: true
-        }});
+                origin: "http://localhost:4200", // <--- Agrega tu origen permitido aquí
+                methods: ["GET", "POST"],
+                allowedHeaders: ["Authorization"],
+                credentials: true
+            }
+        });
     }
 
 
@@ -31,7 +32,7 @@ export class SocketIoServer {
         return SocketIoServer.instance;
     }
 
-    public async workSocket(){
+    public async workSocket() {
         /**Middlewares */
         // this.io.use((socket, next) => {
         //     const username = socket.handshake.auth.username;
@@ -44,13 +45,15 @@ export class SocketIoServer {
 
         await this.io.on('connection', (socket) => {
 
-            console.log('a user connected',socket.id);
-
-            socket.on('disconnect', (socket) => {
-                console.log('user disconnected',socket);
+            console.log('a user connected',socket.handshake.auth.iduser);
+            this.io.emit('user_connected', socket.handshake.auth.iduser);
+            
+            socket.on('disconnect', (socketDisconected) => {
+                console.log("user_disconnected", socket.handshake.auth.iduser);
+                this.io.emit('user_disconnected', socket.handshake.auth.iduser);
             });
         });
-        
+
     }
 
 }
