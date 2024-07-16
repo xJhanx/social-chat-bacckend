@@ -45,13 +45,29 @@ export class SocketIoServer {
 
         await this.io.on('connection', (socket) => {
 
-            console.log('a user connected',socket.handshake.auth.iduser);
+            console.log('a user connected', socket.handshake.auth.iduser);
             this.io.emit('user_connected', socket.handshake.auth.iduser);
-            
+
             socket.on('disconnect', (socketDisconected) => {
                 console.log("user_disconnected", socket.handshake.auth.iduser);
                 this.io.emit('user_disconnected', socket.handshake.auth.iduser);
             });
+
+            socket.on('status_event', (data) => {
+                let recipientStatus = false;
+
+                this.io.sockets.sockets.forEach((socketRecipient) => {
+                    if (+socketRecipient.handshake.auth.iduser === +data.recipient) {
+                        recipientStatus = true;
+                    }
+                });
+
+                this.io.sockets.sockets.forEach((socketOwner) => {
+                    if (+socketOwner.handshake.auth.iduser === +data.owner) {
+                        this.io.to(socketOwner.id).emit('response_status_event', recipientStatus);
+                    }
+                })
+            })
         });
 
     }
